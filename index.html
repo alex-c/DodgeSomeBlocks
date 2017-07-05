@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CG Projekt</title>
+    <link rel="stylesheet" type="text/css" href="assets/app.css" />
+</head>
+<body>
+    <!-- Libraries -->
+    <script src="assets/libs/three.js"></script>
+    <script src="assets/libs/ReusableRay.js"></script>
+    <script src="assets/libs/ColladaLoader2.js"></script>
+    <script src="assets/libs/shader/CopyShader.js"></script>
+    <script src="assets/libs/shader/DigitalGlitch.js"></script>
+    <script src="assets/libs/postproc/EffectComposer.js"></script>
+    <script src="assets/libs/postproc/RenderPass.js"></script>
+    <script src="assets/libs/postproc/MaskPass.js"></script>
+    <script src="assets/libs/postproc/ShaderPass.js"></script>
+    <script src="assets/libs/postproc/GlitchPass.js"></script>
+    <!-- Game elements -->
+    <script src="game/worldgen.js"></script>
+    <script src="game/sky.js"></script>
+    <script src="game/glider.js"></script>
+    <script src="game/game.js"></script>
+    <script src="game/presets.js"></script>
+    <!-- Canvas container -->
+    <div id="app-container"></div>
+    <!-- Main overlay -->
+    <div id="overlay">
+        <div id="overlay-inner">
+            <span id="overlay-message">Welcome to {GameName}!</span>
+            <br /><br />
+        	<span id="game-creation">
+        		Choose a difficulty:
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="difficult">Difficult</option>
+                </select><br />
+                Choose a camera mode:
+                <select id="camera-mode">
+                    <option value="behind">from behind</option>
+                    <option value="above">from above</option>
+                </select><br />
+                <button id="game-start">Start!</button>
+        	</span>
+        </div>
+    </div>
+    <!-- Game stats overlay -->
+    <div id="game-stats">
+        <div id="game-stats-inner">
+            Remaining distance: <span id="distanceContainer"></span>
+            Speed: <span id="speedContainer"></span>
+        </div>
+    </div>
+    <!-- Events & Effects overlay -->
+    <div id="events-effects"></div>
+    <!-- Game initialization -->
+    <script>
+        //Global game object
+        var game;
+        //Debug mode
+        var debug = true;
+        //UI helpers
+        var distanceContainer = document.getElementById('distanceContainer');
+        var speedContainer = document.getElementById('speedContainer');
+        var overlayMessage = document.getElementById('overlay-message');
+        var eeContainer = document.getElementById('events-effects');
+        var eventId = 0;
+        //UI callbacks
+        function showOverlay(won) {
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = '-webkit-box';
+            overlay.style.display = '-moz-box';
+            overlay.style.display = 'box';
+            if(won) {
+                overlayMessage.textContent = 'Victory!';
+            } else {
+                overlayMessage.textContent = 'Better luck next time!';
+            }
+            var gameStats = document.getElementById('game-stats');
+            gameStats.style.display = 'none';
+            eeContainer.innerHtml = '';
+        }
+        function hideOverlay() {
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = 'none';
+            var gameStats = document.getElementById('game-stats');
+            gameStats.style.display = '-webkit-box';
+            gameStats.style.display = '-moz-box';
+            gameStats.style.display = 'box';
+        }
+        function updateGameStats(distance, speed) {
+            distanceContainer.textContent = parseInt(distance);
+            speedContainer.textContent = Math.round(speed*100)/100;
+        }
+        function addEvent(event, value) {
+            var eeNode = document.createElement("div");
+            eeNode.className = "ee-box";
+            var textNode;
+            if(event == "slowdown") {
+                eeNode.className += " ee-box-up"
+                textNode = document.createTextNode("Slowed down by "+value+"!");
+            } else if(event == "speedup") {
+                eeNode.className += " ee-box-down"
+                textNode = document.createTextNode("Sped up by "+value+"!");
+            }
+            eeNode.appendChild(textNode);
+            eeContainer.appendChild(eeNode);
+            setTimeout(function() {
+                eeNode.remove();
+            }, 1000);
+        }
+        function addEffect(effect, duration) {
+            var eeNode = document.createElement("div");
+            eeNode.className = "ee-box";
+            var textNode;
+            if(effect == "glitch") {
+                eeNode.className += " ee-box-down"
+                textNode = document.createTextNode("Glitching!");
+            } else if(effect == "reversedControls") {
+                eeNode.className += " ee-box-down"
+                textNode = document.createTextNode("Controls reversed for "+duration+" seconds!");
+            } else if(effect == "speedfreeze") {
+                eeNode.className += " ee-box-up"
+                textNode = document.createTextNode("Speed frozen for "+duration+" seconds!");
+            } else if(effect == "blackout") {
+                eeNode.className += " ee-box-down"
+                textNode = document.createTextNode("Blacked out for "+duration+" seconds!");
+            }
+            eeNode.appendChild(textNode);
+            eeContainer.appendChild(eeNode);
+            setTimeout(function() {
+                eeNode.remove();
+            }, duration*1000);
+        }
+        //Game start routine
+        function startGame(options, cameraMode) {
+            game = new Game('#app-container', options, cameraMode, debug);
+            game.callbacks.gameEnd = showOverlay;
+            game.callbacks.updateStats = updateGameStats;
+            game.callbacks.event = addEvent;
+            game.callbacks.effect = addEffect;
+            game.render();
+            hideOverlay();
+        }
+        window.addEventListener('resize', function(event) {
+            game.updateViewport(window.innerWidth, window.innerHeight);
+        });
+        window.addEventListener('keydown', function(event) {
+            var keyCode = event.keyCode;
+            if(keyCode == 37) {
+                game.strafing(true, 'left');
+            } else if(keyCode == 39) {
+                game.strafing(true, 'right');
+            }
+        });
+        window.addEventListener('keyup', function(event) {
+            var keyCode = event.keyCode;
+            if(keyCode == 37 || keyCode == 39) {
+                game.strafing(false);
+            }
+        });
+        var startButton = document.getElementById('game-start');
+        startButton.addEventListener('click', function() {
+            var difficulty = document.getElementById('difficulty').value;
+            var cameraMode = document.getElementById('camera-mode').value;
+            startGame(Presets[difficulty], cameraMode);
+        });
+    </script>
+</body>
+</html>

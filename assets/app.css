@@ -1,0 +1,87 @@
+body {
+    margin: 0px;
+}
+
+canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    z-index: 100;
+}
+
+#overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 500;
+}
+
+#overlay-inner {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    box-orient: horizontal;
+    -webkit-box-pack: center;
+    -moz-box-pack: center;
+    box-pack: center;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    box-align: center;
+    color: #ffffff;
+    text-align: center;
+}
+
+#overlay-won {
+    display: none;
+}
+
+#overlay-lost {
+    display: none;
+}
+
+#game-stats {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-top: 1px solid black;
+    background-color: #3C3C3C;
+    color: white;
+    display: none;
+    z-index: 1000;
+}
+
+#game-stats-inner {
+    margin: 4px;
+}
+
+#events-effects {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 4px;
+    z-index: 1001;
+}
+
+.ee-box {
+    width: 240px;
+    margin-bottom: 4px;
+    padding: 4px;
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
+.ee-box-up {
+    background-color: #AAFFAA;
+}
+
+.ee-box-down {
+    background-color: #FFAAAA;
+}
