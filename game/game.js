@@ -29,6 +29,8 @@ function Game(selector, options, cameraMode, debugMode) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000000);
     this.renderer = new THREE.WebGLRenderer();
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
     this.scene.add(this.camera);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor(0xffffff);
@@ -65,12 +67,11 @@ function Game(selector, options, cameraMode, debugMode) {
 
     //Add glider light
     this.gliderLight = new THREE.SpotLight(0xffffff);
-    this.gliderLight.name = "gliderLight";
     this.gliderLight.castShadow = true;
-    this.gliderLight.shadow.mapSize.width = 1024;
-    this.gliderLight.shadow.mapSize.height = 1024;
-    this.gliderLight.shadow.camera.near = 500;
-    this.gliderLight.shadow.camera.far = 4000;
+    this.gliderLight.shadow.mapSize.width = 512;
+    this.gliderLight.shadow.mapSize.height = 512;
+    this.gliderLight.shadow.camera.near = 0.5;
+    this.gliderLight.shadow.camera.far = 50;
     this.gliderLight.shadow.camera.fov = 30;
     this.gliderLight.position.set(0, 10, 0);
     var targetObject = new THREE.Object3D();

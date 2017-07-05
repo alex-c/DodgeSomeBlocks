@@ -17,6 +17,7 @@ var WorldGeneration = new function() {
         mainPlane.position.x = options.worldLength / 2 + options.worldWidth / 2;
         mainPlane.position.y = 0;
         mainPlane.position.z = 0;
+        mainPlane.receiveShadow = true;
         planes.push(mainPlane);
 
         //Start & end zones
@@ -27,12 +28,13 @@ var WorldGeneration = new function() {
         var zoneMaterial = new THREE.MeshPhongMaterial({map: hazardTexture});
         var startZone = new THREE.Mesh(zoneGeometry, zoneMaterial);
         startZone.rotation.x = -0.5 * Math.PI;
-        startZone.position.x = 0;;
-
+        startZone.position.x = 0;
+        startZone.receiveShadow = true;
         planes.push(startZone);
         var endZone = new THREE.Mesh(zoneGeometry, zoneMaterial);
         endZone.rotation.x = -0.5 * Math.PI;
         endZone.position.x = options.worldLength + options.worldWidth;
+        endZone.receiveShadow = true;
         planes.push(endZone);
 
         return planes;
@@ -76,6 +78,7 @@ var WorldGeneration = new function() {
                 cube.position.x = distance;
                 cube.position.y = height / 2;
                 cube.position.z = this.randInt(-options.worldWidth/2, options.worldWidth/2);
+                cube.castShadow = true;
                 obstacles.push(cube);
             }
             distance += options.obstacleDistance;
@@ -95,6 +98,7 @@ var WorldGeneration = new function() {
                 cube.position.x = distance;
                 cube.position.y = 16;
                 cube.position.z = this.randInt(-options.worldWidth/2, options.worldWidth/2);
+                cube.castShadow = true;
                 powerups.push(cube);
             }
             distance += options.obstacleDistance;
@@ -114,6 +118,7 @@ var WorldGeneration = new function() {
                 cube.position.x = distance;
                 cube.position.y = 16;
                 cube.position.z = this.randInt(-options.worldWidth/2, options.worldWidth/2);
+                cube.castShadow = true;
                 powerdowns.push(cube);
             }
             distance += options.obstacleDistance;
